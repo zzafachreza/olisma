@@ -57,11 +57,11 @@ export default function Home({navigation}) {
         end={{x: 0.9, y: 1}}>
         <View style={styles.header}>
           <View>
-            <Text style={styles.greetingText}>Selamat datang,</Text>
-            <Text style={styles.greetingText}>{user.nama_lengkap || 'User'}</Text>
+            <Text style={styles.greetingText}>SELAMAT DATANG,</Text>
+            <Text style={styles.greetingText}>PT OLIVIN KALIS TAMA</Text>
           </View>
           <FastImage
-            source={require('../../assets/logo.png')}
+            source={require('../../assets/logohome.png')}
             style={styles.logo}
             resizeMode="contain"
           />
@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
   },
   greetingText: {
     fontFamily: fonts.secondary[600],
-    fontSize: 20,
+    fontSize: 15,
     color: 'white',
   },
   scrollContainer: {

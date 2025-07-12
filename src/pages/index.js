@@ -49,7 +49,7 @@ import ProdukDetail from './ProdukDetail';
 import RiwayatTransaksi from './RiwayatTransaksi';
 import Artikel from './Artikel';
 import DetailArtikel from './Artikel/detail';
-
+import DetailTransaksi from './RiwayatTransaksi/detialtransaksi';
 
 // NEW
 
@@ -103,6 +103,7 @@ export {
 Checkout,
 ProdukDetail,
 RiwayatTransaksi,
+DetailTransaksi,
 Artikel,
 DetailArtikel
 

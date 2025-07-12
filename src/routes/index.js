@@ -103,6 +103,7 @@ import {
   ProdukDetail,
   RiwayatTransaksi,
   DetailArtikel,
+  DetailTransaksi,
 } from '../pages';
 import {colors} from '../utils';
 import {Icon} from 'react-native-elements';
@@ -184,6 +185,14 @@ export default function Router() {
          <Stack.Screen
         name="RiwayatTransaksi"
         component={MainApp}
+        options={{
+          headerShown: false,
+        }}
+      />
+
+          <Stack.Screen
+        name="DetailTransaksi"
+        component={DetailTransaksi}
         options={{
           headerShown: false,
         }}

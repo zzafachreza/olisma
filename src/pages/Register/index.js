@@ -54,13 +54,13 @@ export default function Register({navigation, route}) {
             justifyContent: 'center',
             alignItems: 'center',
             padding: 20,
-            marginTop:70
+            marginTop:0
           }}>
           <Image
-            source={require('../../assets/logo.png')}
+            source={require('../../assets/logohome.png')}
             style={{
               width:200,
-              height:57,
+              height:200,
             }}
           />
         </View>
@@ -70,7 +70,7 @@ export default function Register({navigation, route}) {
             justifyContent: 'flex-start',
             backgroundColor: colors.white,
             paddingHorizontal: 20,
-            marginTop:50
+            marginTop:20
           }}>
           <Text
             style={{

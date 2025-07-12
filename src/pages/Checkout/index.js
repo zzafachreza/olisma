@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -13,8 +13,8 @@ import { colors, fonts } from '../../utils';
 import { MyButton, MyHeader, MyInput, MyRadio } from '../../components';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Component Start
 export default function Checkout({ navigation, route }) {
   const { product } = route.params || {
     product: {
@@ -35,6 +35,60 @@ export default function Checkout({ navigation, route }) {
   const banks = ['BCA', 'BRI', 'BNI', 'Mandiri'];
   const eWallets = ['OVO', 'DANA', 'ShopeePay', 'Gopay'];
   const totalPrice = product.price * quantity;
+
+  const saveTransactionToStorage = async () => {
+    try {
+      const transaction = {
+        id: orderNumber,
+        date: new Date().toISOString(),
+        status: 'Menunggu Konfirmasi',
+        product: {
+          name: product.name,
+          price: product.price,
+          quantity: quantity,
+          total: totalPrice,
+          image: product.image
+        },
+        payment: {
+          method: selectedPayment,
+          bank: selectedBank,
+          proof: paymentProof
+        },
+        tracking: [
+          {
+            time: new Date().toLocaleString('id-ID', { 
+              day: 'numeric', 
+              month: 'short', 
+              hour: '2-digit', 
+              minute: '2-digit' 
+            }),
+            status: 'Menunggu Konfirmasi',
+            note: 'Pembayaran sedang diverifikasi admin'
+          }
+        ]
+      };
+
+      // Get existing transactions
+         console.log('Menyimpan transaksi:', transaction); // <-- Tambahkan ini
+      const existingTransactions = await AsyncStorage.getItem('transactions');
+      let transactions = [];
+      
+      if (existingTransactions) {
+        transactions = JSON.parse(existingTransactions);
+           console.log('Transaksi yang ada:', transactions); // <-- Tambahkan ini
+      }
+      
+      // Add new transaction
+      transactions.unshift(transaction);
+      
+      // Save back to storage
+      await AsyncStorage.setItem('transactions', JSON.stringify(transactions));
+       console.log('Berhasil menyimpan transaksi'); // <-- Tambahkan ini
+      
+    } catch (error) {
+      console.error('Error saving transaction:', error);
+    }
+  };
 
   const selectImageSource = () => {
     Alert.alert('Upload Bukti Transfer', 'Pilih sumber gambar', [
@@ -65,12 +119,19 @@ export default function Checkout({ navigation, route }) {
     });
   };
 
-  const confirmPayment = () => {
+  const confirmPayment = async () => {
     if (!paymentProof) {
       Alert.alert('Error', 'Harap upload bukti transfer terlebih dahulu');
       return;
     }
-    setOrderConfirmed(true);
+    
+    try {
+      await saveTransactionToStorage();
+      setOrderConfirmed(true);
+    } catch (error) {
+      Alert.alert('Error', 'Gagal menyimpan transaksi');
+      console.error(error);
+    }
   };
 
   const openWhatsApp = () => {
@@ -92,8 +153,16 @@ export default function Checkout({ navigation, route }) {
             <Text style={styles.summaryText}>Total: Rp {totalPrice.toLocaleString()}</Text>
           </View>
           <View style={styles.actionButtons}>
-            <MyButton title="Kembali ke Beranda" type="outline" onPress={() => navigation.navigate('Home')} />
-            <MyButton title="Hubungi CS" onPress={openWhatsApp} style={styles.helpButton} />
+            <MyButton 
+              title="Kembali ke Beranda" 
+              type="outline" 
+              onPress={() => navigation.navigate('Home')} 
+            />
+            <MyButton 
+              title="Hubungi CS" 
+              onPress={openWhatsApp} 
+              style={styles.helpButton} 
+            />
           </View>
         </View>
       </View>

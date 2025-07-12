@@ -57,10 +57,10 @@ export default function Login({navigation, route}) {
           alignItems: 'center',
         }}>
         <Image
-          source={require('../../assets/logo.png')}
+          source={require('../../assets/logohome.png')}
           style={{
             width: 200,
-            height: 57,
+            height: 200,
           }}
         />
       </View>
