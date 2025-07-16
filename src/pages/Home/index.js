@@ -1,0 +1,184 @@
+import {StyleSheet, Text, View, ScrollView, TouchableOpacity, Dimensions} from 'react-native';
+import React, {useState} from 'react';
+import {SafeAreaView} from 'react-native-safe-area-context';
+import {colors, fonts} from '../../utils';
+import FastImage from 'react-native-fast-image';
+import LinearGradient from 'react-native-linear-gradient';
+
+const {width} = Dimensions.get('window');
+
+export default function Home({navigation}) {
+  const [user] = useState({});
+  const [featuredProducts] = useState([
+   {
+      id: 1,
+      name: 'Paket Pendirian CV',
+      price: 3500000,
+      priceTitle: 'Rp 3.500.000',
+      description: `Usaha bermodal kecil, pengambilan keputusan lebih mudah, & pajak lebih rendah.`,
+      image: require('../../assets/product_placeholder.png'),
+    },
+    {
+      id: 2,
+      name: 'Paket Pendirian PT',
+      price: 4500000,
+      priceTitle: 'Rp 4.500.000',
+      description: `Nikmati berbagai keunggulan bisnis dengan badan usaha berbentuk Perseroan Terbatas.`,
+      image: require('../../assets/product_placeholder2.png'),
+    },
+    {
+      id: 3,
+      name: 'Paket Pendirian Firma',
+      price: 3500000,
+      priceTitle: 'Rp 3.500.000',
+      description: `Pendirian Firma untuk Anda yang membutuhkan badan usaha berbentuk persekutuan`,
+      image: require('../../assets/product_placeholder3.png'),
+    },
+    {
+      id: 4,
+      name: 'Persekutuan Perdata',
+      price: 3500000,
+      priceTitle: 'Rp 3.500.000',
+      description: `Pendirian badan usaha berbentuk persekutuan perdata.`,
+      image: require('../../assets/product_placeholder4.png'),
+    },
+  ]);
+
+  const navigateToDetail = (product) => {
+    navigation.navigate('ProdukDetail', { product });
+  };
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <LinearGradient
+        colors={[colors.primary, '#FEFAE0']}
+        style={styles.headerGradient}
+        start={{x: 0, y: 0}}
+        end={{x: 0.9, y: 1}}>
+        <View style={styles.header}>
+          <View>
+            <Text style={styles.greetingText}>SELAMAT DATANG,</Text>
+            <Text style={styles.greetingText}>PT OLIVIN KALIS TAMA</Text>
+          </View>
+          <FastImage
+            source={require('../../assets/logohome.png')}
+            style={styles.logo}
+            resizeMode="contain"
+          />
+        </View>
+      </LinearGradient>
+
+      <ScrollView 
+        contentContainerStyle={styles.scrollContainer}
+        showsVerticalScrollIndicator={false}>
+        <View style={styles.productsGrid}>
+          {featuredProducts.map((product) => (
+            <TouchableOpacity
+              key={product.id}
+              style={styles.productCard}
+              onPress={() => navigateToDetail(product)}>
+              <View style={styles.cardContent}>
+                <FastImage
+                  source={product.image}
+                  style={styles.productImage}
+                  resizeMode="contain"
+                />
+                <View style={styles.productInfo}>
+                  <Text style={styles.productName}>{product.name}</Text>
+                  <Text style={styles.productPrice}>{product.priceTitle}</Text>
+                </View>
+              </View>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#F5F7FA',
+  },
+  headerGradient: {
+    paddingBottom: 10,
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 10,
+    paddingBottom: 20,
+    top: 10,
+  },
+  logo: {
+    width: 50,
+    height: 50,
+    borderRadius: 10,
+  },
+  greetingText: {
+    fontFamily: fonts.secondary[600],
+    fontSize: 15,
+    color: 'white',
+  },
+  scrollContainer: {
+    paddingBottom: 30,
+  },
+  productsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    paddingHorizontal: 15,
+    marginTop: 30, // ganti dari 80 ke 30
+  },
+  productCard: {
+    width: '48%',
+    aspectRatio: 1,
+    backgroundColor: 'white',
+    borderRadius: 15,
+    marginBottom: 15,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    overflow: 'hidden',
+  },
+  cardContent: {
+    flex: 1,
+    padding: 10,
+    justifyContent: 'space-between',
+  },
+  productImage: {
+    width: '100%',
+    height: '60%',
+    resizeMode: 'contain',
+  },
+  productInfo: {
+  backgroundColor: colors.primary,
+  borderRadius: 10,
+  padding: 8,
+  minHeight: 60,
+  justifyContent: 'center',
+  alignItems: 'center',
+  },
+  productName: {
+     fontFamily: fonts.secondary[700],
+  fontSize: 10,
+  color: 'white',
+  textAlign: 'center',
+  marginBottom: 4,
+  flexShrink: 1,
+
+  },
+  productPrice: {
+     fontFamily: fonts.secondary[600],
+  fontSize: 11,
+  color: 'white',
+  textAlign: 'center',
+  },
+});
