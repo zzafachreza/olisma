@@ -1,53 +1,59 @@
-import { View, Text, Image, ScrollView } from 'react-native';
+import {View, Text, Image, ScrollView} from 'react-native';
 import React from 'react';
-import { colors, fonts } from '../../utils';
-import { MyHeader } from '../../components';
+import {colors, fonts} from '../../utils';
+import {MyHeader} from '../../components';
+import {webURL} from '../../utils/localStorage';
 
-export default function DetailArtikel({ route }) {
-  const { artikel } = route.params;
+export default function DetailArtikel({route}) {
+  const {artikel} = route.params;
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.white }}>
+    <View style={{flex: 1, backgroundColor: colors.white}}>
       {/* MyHeader dengan judul artikel */}
       <MyHeader title={artikel.title} />
-      
+
       <ScrollView>
-        <View style={{ padding: 20 }}>
-          <Image 
-            source={artikel.image}
+        <View style={{padding: 20}}>
+          <Image
+            source={{
+              uri: webURL + artikel.foto,
+            }}
             style={{
               width: '100%',
               height: 200,
               borderRadius: 10,
-              marginBottom: 20
+              marginBottom: 20,
             }}
           />
-          
-          <Text style={{
-            fontFamily: fonts.primary[600],
-            fontSize: 18,
-            color: colors.black,
-            marginBottom: 10
-          }}>
-            {artikel.title}
+
+          <Text
+            style={{
+              fontFamily: fonts.primary[600],
+              fontSize: 18,
+              color: colors.black,
+              marginBottom: 10,
+            }}>
+            {artikel.judul}
           </Text>
-          
-          <Text style={{
-            fontFamily: fonts.primary[400],
-            fontSize: 12,
-            color: colors.gray,
-            marginBottom: 20
-          }}>
-            {artikel.date} • Oleh {artikel.author}
+
+          <Text
+            style={{
+              fontFamily: fonts.primary[400],
+              fontSize: 12,
+              color: colors.gray,
+              marginBottom: 20,
+            }}>
+            {artikel.tanggal} • Oleh {artikel.author}
           </Text>
-          
-          <Text style={{
-            fontFamily: fonts.primary[400],
-            fontSize: 14,
-            color: colors.black,
-            lineHeight: 22
-          }}>
-            {artikel.content}
+
+          <Text
+            style={{
+              fontFamily: fonts.primary[400],
+              fontSize: 14,
+              color: colors.black,
+              lineHeight: 22,
+            }}>
+            {artikel.konten}
           </Text>
         </View>
       </ScrollView>

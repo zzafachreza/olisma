@@ -66,13 +66,12 @@ export default function Splash({navigation}) {
         }}
       />
 
-        
-      <View style={{
-        marginTop:50
-      }}>
+      <View
+        style={{
+          marginTop: 50,
+        }}>
         <ActivityIndicator color={colors.primary} size="large" />
       </View>
-      
     </SafeAreaView>
   );
 }

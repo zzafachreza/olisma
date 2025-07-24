@@ -129,7 +129,7 @@ const MainApp = () => {
 
 export default function Router() {
   return (
-    <Stack.Navigator initialRouteName="MainApp">
+    <Stack.Navigator initialRouteName="Splash">
       <Stack.Screen
         name="Splash"
         component={Splash}
@@ -146,7 +146,6 @@ export default function Router() {
         }}
       />
 
-
       <Stack.Screen
         name="CheckOut"
         component={Checkout}
@@ -155,7 +154,6 @@ export default function Router() {
         }}
       />
 
-      
       <Stack.Screen
         name="ProdukDetail"
         component={ProdukDetail}
@@ -164,8 +162,7 @@ export default function Router() {
         }}
       />
 
-
-  <Stack.Screen
+      <Stack.Screen
         name="Artikel"
         component={MainApp}
         options={{
@@ -173,7 +170,7 @@ export default function Router() {
         }}
       />
 
-        <Stack.Screen
+      <Stack.Screen
         name="DetailArtikel"
         component={DetailArtikel}
         options={{
@@ -181,8 +178,7 @@ export default function Router() {
         }}
       />
 
-
-         <Stack.Screen
+      <Stack.Screen
         name="RiwayatTransaksi"
         component={MainApp}
         options={{
@@ -190,15 +186,13 @@ export default function Router() {
         }}
       />
 
-          <Stack.Screen
+      <Stack.Screen
         name="DetailTransaksi"
         component={DetailTransaksi}
         options={{
           headerShown: false,
         }}
       />
-
-
 
       <Stack.Screen
         name="PelangganAdd"

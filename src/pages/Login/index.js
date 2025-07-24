@@ -11,7 +11,7 @@ import axios from 'axios';
 import {apiURL, storeData} from '../../utils/localStorage';
 import MyLoading from '../../components/MyLoading';
 import {TouchableOpacity} from 'react-native';
-import { Image } from 'react-native';
+import {Image} from 'react-native';
 export default function Login({navigation, route}) {
   const [kirim, setKirim] = useState({
     username: '',
@@ -32,7 +32,7 @@ export default function Login({navigation, route}) {
     } else if (kirim.password.length == 0) {
       toast.show('Kata sandi masih kosong !');
     } else {
-      console.log(kirim);
+      // console.log(kirim);
       setLoading(true);
       axios.post(apiURL + 'login', kirim).then(res => {
         setTimeout(() => {
@@ -70,7 +70,7 @@ export default function Login({navigation, route}) {
           justifyContent: 'flex-start',
           backgroundColor: colors.white,
           paddingHorizontal: 20,
-          marginTop:20
+          marginTop: 20,
         }}>
         <Text
           style={{

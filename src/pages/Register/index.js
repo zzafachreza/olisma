@@ -37,6 +37,7 @@ export default function Register({navigation, route}) {
       console.log(kirim);
       setLoading(true);
       axios.post(apiURL + 'register', kirim).then(res => {
+        console.log(res.data);
         setTimeout(() => {
           setLoading(false);
           toast.show(res.data.message, {type: 'success'});
@@ -54,13 +55,13 @@ export default function Register({navigation, route}) {
             justifyContent: 'center',
             alignItems: 'center',
             padding: 20,
-            marginTop:0
+            marginTop: 0,
           }}>
           <Image
             source={require('../../assets/logohome.png')}
             style={{
-              width:200,
-              height:200,
+              width: 200,
+              height: 200,
             }}
           />
         </View>
@@ -70,7 +71,7 @@ export default function Register({navigation, route}) {
             justifyContent: 'flex-start',
             backgroundColor: colors.white,
             paddingHorizontal: 20,
-            marginTop:20
+            marginTop: 20,
           }}>
           <Text
             style={{
