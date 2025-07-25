@@ -3,6 +3,7 @@ import React from 'react';
 import {colors, fonts} from '../../utils';
 import {MyHeader} from '../../components';
 import {webURL} from '../../utils/localStorage';
+import FastImage from 'react-native-fast-image';
 
 export default function DetailArtikel({route}) {
   const {artikel} = route.params;
@@ -10,11 +11,11 @@ export default function DetailArtikel({route}) {
   return (
     <View style={{flex: 1, backgroundColor: colors.white}}>
       {/* MyHeader dengan judul artikel */}
-      <MyHeader title={artikel.title} />
+      <MyHeader title={artikel.judul} />
 
       <ScrollView>
         <View style={{padding: 20}}>
-          <Image
+          <FastImage
             source={{
               uri: webURL + artikel.foto,
             }}

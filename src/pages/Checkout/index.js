@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -9,82 +9,50 @@ import {
   Alert,
   Linking,
 } from 'react-native';
-import { colors, fonts } from '../../utils';
-import { MyButton, MyHeader, MyInput, MyRadio } from '../../components';
+import {colors, fonts} from '../../utils';
+import {MyButton, MyHeader, MyInput, MyRadio} from '../../components';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
+import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import FastImage from 'react-native-fast-image';
+import {apiURL, getData, webURL} from '../../utils/localStorage';
+import axios from 'axios';
 
-export default function Checkout({ navigation, route }) {
-  const { product } = route.params || {
-    product: {
-      id: 1,
-      name: 'Sweater Rajut Premium',
-      price: 249000,
-      image: require('../../assets/product_placeholder.jpg'),
-    },
-  };
-
+export default function Checkout({navigation, route}) {
+  const {product} = route.params;
+  const [user, setUser] = useState({});
   const [quantity, setQuantity] = useState(1);
   const [selectedPayment, setSelectedPayment] = useState('bank');
   const [selectedBank, setSelectedBank] = useState('');
   const [paymentProof, setPaymentProof] = useState(null);
   const [orderConfirmed, setOrderConfirmed] = useState(false);
-  const [orderNumber] = useState(`ORD-${Math.floor(100000 + Math.random() * 900000)}`);
+  const [orderNumber] = useState(
+    `ORD-${Math.floor(100000 + Math.random() * 900000)}`,
+  );
 
   const banks = ['BCA', 'BRI', 'BNI', 'Mandiri'];
   const eWallets = ['OVO', 'DANA', 'ShopeePay', 'Gopay'];
-  const totalPrice = product.price * quantity;
+  const totalPrice = product.harga * quantity;
+
+  useEffect(() => {
+    getData('user').then(u => setUser(u));
+  }, []);
 
   const saveTransactionToStorage = async () => {
     try {
-      const transaction = {
-        id: orderNumber,
-        date: new Date().toISOString(),
-        status: 'Menunggu Konfirmasi',
-        product: {
-          name: product.name,
-          price: product.price,
-          quantity: quantity,
-          total: totalPrice,
-          image: product.image
-        },
-        payment: {
-          method: selectedPayment,
-          bank: selectedBank,
-          proof: paymentProof
-        },
-        tracking: [
-          {
-            time: new Date().toLocaleString('id-ID', { 
-              day: 'numeric', 
-              month: 'short', 
-              hour: '2-digit', 
-              minute: '2-digit' 
-            }),
-            status: 'Menunggu Konfirmasi',
-            note: 'Pembayaran sedang diverifikasi admin'
-          }
-        ]
+      let kirim = {
+        fid_jasa: product.id_jasa,
+        jumlah: quantity,
+        total: totalPrice,
+        pembayaran: selectedBank,
+        fid_customer: user.id_customer,
+        bukti_transaksi: paymentProof,
       };
 
-      // Get existing transactions
-         console.log('Menyimpan transaksi:', transaction); // <-- Tambahkan ini
-      const existingTransactions = await AsyncStorage.getItem('transactions');
-      let transactions = [];
-      
-      if (existingTransactions) {
-        transactions = JSON.parse(existingTransactions);
-           console.log('Transaksi yang ada:', transactions); // <-- Tambahkan ini
-      }
-      
-      // Add new transaction
-      transactions.unshift(transaction);
-      
-      // Save back to storage
-      await AsyncStorage.setItem('transactions', JSON.stringify(transactions));
-       console.log('Berhasil menyimpan transaksi'); // <-- Tambahkan ini
-      
+      axios.post(apiURL + 'insert_transaksi', kirim).then(res => {
+        console.log(res.data);
+      });
+      console.log('Berhasil menyimpan transaksi', kirim); // <-- Tambahkan ini
     } catch (error) {
       console.error('Error saving transaction:', error);
     }
@@ -92,31 +60,36 @@ export default function Checkout({ navigation, route }) {
 
   const selectImageSource = () => {
     Alert.alert('Upload Bukti Transfer', 'Pilih sumber gambar', [
-      { text: 'Gallery', onPress: () => handleImageSelection('library') },
-      { text: 'Kamera', onPress: () => handleImageSelection('camera') },
-      { text: 'Batal', style: 'cancel' },
+      {text: 'Gallery', onPress: () => handleImageSelection('library')},
+      {text: 'Kamera', onPress: () => handleImageSelection('camera')},
+      {text: 'Batal', style: 'cancel'},
     ]);
   };
 
-  const handleImageSelection = (source) => {
-    const options = {
-      mediaType: 'photo',
-      maxWidth: 800,
-      maxHeight: 800,
-      quality: 0.8,
-    };
-
+  const handleImageSelection = source => {
     const imagePicker = source === 'camera' ? launchCamera : launchImageLibrary;
 
-    imagePicker(options, (response) => {
-      if (response.didCancel) {
-        console.log('User cancelled image picker');
-      } else if (response.errorMessage) {
-        console.log('ImagePicker Error: ', response.errorMessage);
-      } else if (response.assets && response.assets[0].uri) {
-        setPaymentProof(response.assets[0].uri);
-      }
-    });
+    imagePicker(
+      {
+        includeBase64: true,
+        mediaType: 'photo',
+        maxWidth: 800,
+        maxHeight: 800,
+        quality: 0.8,
+      },
+      response => {
+        if (response.didCancel) {
+          console.log('User cancelled image picker');
+        } else if (response.errorMessage) {
+          console.log('ImagePicker Error: ', response.errorMessage);
+        } else if (response.assets) {
+          console.log(response.assets[0]);
+          setPaymentProof(
+            `data:${response.assets[0].type};base64, ${response.assets[0].base64}`,
+          );
+        }
+      },
+    );
   };
 
   const confirmPayment = async () => {
@@ -124,44 +97,51 @@ export default function Checkout({ navigation, route }) {
       Alert.alert('Error', 'Harap upload bukti transfer terlebih dahulu');
       return;
     }
-    
+
     try {
       await saveTransactionToStorage();
-      setOrderConfirmed(true);
+      // setOrderConfirmed(true);
     } catch (error) {
       Alert.alert('Error', 'Gagal menyimpan transaksi');
       console.error(error);
     }
   };
 
-  const openWhatsApp = () => {
-    const message = `Halo, saya butuh bantuan untuk order #${orderNumber} (${product.name})`;
-    Linking.openURL(`whatsapp://send?phone=6281234567890&text=${encodeURIComponent(message)}`);
-  };
-
   if (orderConfirmed) {
     return (
       <View style={styles.container}>
-        <MyHeader title="Konfirmasi Pesanan" onPress={() => navigation.goBack()} />
+        <MyHeader
+          title="Konfirmasi Pesanan"
+          onPress={() => navigation.goBack()}
+        />
         <View style={styles.confirmationContainer}>
-          <Icon name="checkmark-circle" size={80} color="#4BB543" style={styles.successIcon} />
-          <Text style={styles.confirmationTitle}>Pembayaran Sedang Diverifikasi</Text>
+          <Icon
+            name="checkmark-circle"
+            size={80}
+            color="#4BB543"
+            style={styles.successIcon}
+          />
+          <Text style={styles.confirmationTitle}>
+            Pembayaran Sedang Diverifikasi
+          </Text>
           <Text style={styles.orderNumber}>Nomor Pesanan: #{orderNumber}</Text>
           <View style={styles.summaryContainer}>
-            <Text style={styles.summaryText}>Produk: {product.name}</Text>
+            <Text style={styles.summaryText}>Produk: {product.nama_jasa}</Text>
             <Text style={styles.summaryText}>Jumlah: {quantity}</Text>
-            <Text style={styles.summaryText}>Total: Rp {totalPrice.toLocaleString()}</Text>
+            <Text style={styles.summaryText}>
+              Total: Rp {totalPrice.toLocaleString()}
+            </Text>
           </View>
           <View style={styles.actionButtons}>
-            <MyButton 
-              title="Kembali ke Beranda" 
-              type="outline" 
-              onPress={() => navigation.navigate('Home')} 
+            <MyButton
+              title="Kembali ke Beranda"
+              type="outline"
+              onPress={() => navigation.navigate('Home')}
             />
-            <MyButton 
-              title="Hubungi CS" 
-              onPress={openWhatsApp} 
-              style={styles.helpButton} 
+            <MyButton
+              title="Hubungi CS"
+              onPress={openWhatsApp}
+              style={styles.helpButton}
             />
           </View>
         </View>
@@ -177,12 +157,21 @@ export default function Checkout({ navigation, route }) {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Ringkasan Pesanan</Text>
           <View style={styles.productContainer}>
-            <Image source={product.image} style={styles.productImage} />
+            <FastImage
+              source={{
+                uri: webURL + product.foto_jasa,
+              }}
+              style={styles.productImage}
+              resizeMode="contain"
+            />
             <View style={styles.productInfo}>
-              <Text style={styles.productName}>{product.name}</Text>
-              <Text style={styles.productPrice}>Rp {product.price.toLocaleString()}</Text>
+              <Text style={styles.productName}>{product.nama_jasa}</Text>
+              <Text style={styles.productPrice}>
+                Rp {new Intl.NumberFormat().format(product.harga)}
+              </Text>
               <View style={styles.quantityContainer}>
-                <TouchableOpacity onPress={() => setQuantity(Math.max(1, quantity - 1))}>
+                <TouchableOpacity
+                  onPress={() => setQuantity(Math.max(1, quantity - 1))}>
                   <Icon name="remove-circle" size={24} color={colors.primary} />
                 </TouchableOpacity>
                 <Text style={styles.quantityText}>{quantity}</Text>
@@ -194,7 +183,9 @@ export default function Checkout({ navigation, route }) {
           </View>
           <View style={styles.totalContainer}>
             <Text style={styles.totalLabel}>Total Pembayaran:</Text>
-            <Text style={styles.totalPrice}>Rp {totalPrice.toLocaleString()}</Text>
+            <Text style={styles.totalPrice}>
+              Rp {totalPrice.toLocaleString()}
+            </Text>
           </View>
         </View>
 
@@ -202,29 +193,57 @@ export default function Checkout({ navigation, route }) {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Metode Pembayaran</Text>
           <View style={styles.paymentOptions}>
-            <MyRadio label="Transfer Bank" selected={selectedPayment === 'bank'} onPress={() => setSelectedPayment('bank')} />
+            <MyRadio
+              label="Transfer Bank"
+              selected={selectedPayment === 'bank'}
+              onPress={() => setSelectedPayment('bank')}
+            />
             {selectedPayment === 'bank' && (
               <View style={styles.bankOptions}>
-                {banks.map((bank) => (
+                {banks.map(bank => (
                   <TouchableOpacity
                     key={bank}
-                    style={[styles.bankOption, selectedBank === bank && styles.selectedBank]}
+                    style={[
+                      styles.bankOption,
+                      selectedBank === bank && styles.selectedBank,
+                    ]}
                     onPress={() => setSelectedBank(bank)}>
-                    <Text style={selectedBank === bank ? styles.selectedBankText : styles.bankText}>{bank}</Text>
+                    <Text
+                      style={
+                        selectedBank === bank
+                          ? styles.selectedBankText
+                          : styles.bankText
+                      }>
+                      {bank}
+                    </Text>
                   </TouchableOpacity>
                 ))}
               </View>
             )}
 
-            <MyRadio label="E-Wallet" selected={selectedPayment === 'ewallet'} onPress={() => setSelectedPayment('ewallet')} />
+            <MyRadio
+              label="E-Wallet"
+              selected={selectedPayment === 'ewallet'}
+              onPress={() => setSelectedPayment('ewallet')}
+            />
             {selectedPayment === 'ewallet' && (
               <View style={styles.bankOptions}>
-                {eWallets.map((wallet) => (
+                {eWallets.map(wallet => (
                   <TouchableOpacity
                     key={wallet}
-                    style={[styles.bankOption, selectedBank === wallet && styles.selectedBank]}
+                    style={[
+                      styles.bankOption,
+                      selectedBank === wallet && styles.selectedBank,
+                    ]}
                     onPress={() => setSelectedBank(wallet)}>
-                    <Text style={selectedBank === wallet ? styles.selectedBankText : styles.bankText}>{wallet}</Text>
+                    <Text
+                      style={
+                        selectedBank === wallet
+                          ? styles.selectedBankText
+                          : styles.bankText
+                      }>
+                      {wallet}
+                    </Text>
                   </TouchableOpacity>
                 ))}
               </View>
@@ -237,15 +256,27 @@ export default function Checkout({ navigation, route }) {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Upload Bukti Transfer</Text>
             {paymentProof ? (
-              <View style={styles.proofContainer}>
-                <Image source={{ uri: paymentProof }} style={styles.proofImage} />
-                <MyButton title="Ganti Bukti" type="outline" onPress={selectImageSource} style={styles.changeProofButton} />
+              <View>
+                <Image source={{uri: paymentProof}} style={styles.proofImage} />
+                <MyButton
+                  title="Ganti Bukti"
+                  type="outline"
+                  onPress={selectImageSource}
+                  style={styles.changeProofButton}
+                />
               </View>
             ) : (
-              <MyButton title="Upload Bukti Transfer" type="outline" icon="camera" onPress={selectImageSource} style={styles.uploadButton} />
+              <MyButton
+                title="Upload Bukti Transfer"
+                type="outline"
+                icon="camera"
+                onPress={selectImageSource}
+                style={styles.uploadButton}
+              />
             )}
             <Text style={styles.noteText}>
-              Pastikan bukti transfer jelas terbaca dan sesuai dengan nominal pembayaran
+              Pastikan bukti transfer jelas terbaca dan sesuai dengan nominal
+              pembayaran
             </Text>
           </View>
         )}
@@ -254,7 +285,11 @@ export default function Checkout({ navigation, route }) {
       {/* Tombol Konfirmasi */}
       {selectedBank !== '' && paymentProof && (
         <View style={styles.footer}>
-          <MyButton title="Konfirmasi Pembayaran" onPress={confirmPayment} style={styles.confirmButton} />
+          <MyButton
+            title="Konfirmasi Pembayaran"
+            onPress={confirmPayment}
+            style={styles.confirmButton}
+          />
         </View>
       )}
     </View>
@@ -379,7 +414,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   changeProofButton: {
-    width: '50%',
+    width: 200,
   },
   noteText: {
     fontFamily: fonts.secondary[400],

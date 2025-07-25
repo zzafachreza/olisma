@@ -1,30 +1,59 @@
-import { View, Text, StyleSheet, TouchableOpacity, Image, Linking } from 'react-native';
-import React from 'react';
-import { colors, fonts } from '../../utils';
-import { MyHeader } from '../../components';
-import { ScrollView } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  Linking,
+} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {colors, fonts} from '../../utils';
+import {MyHeader} from '../../components';
+import {ScrollView} from 'react-native';
 import FastImage from 'react-native-fast-image';
 import Icon from 'react-native-vector-icons/Ionicons';
+import {apiURL, webURL} from '../../utils/localStorage';
+import axios from 'axios';
 
-export default function ProdukDetail({ navigation, route }) {
+export default function ProdukDetail({navigation, route}) {
   // Get product data from navigation params
-  const { product } = route.params || {
+  const {product} = route.params || {
     product: {
       id: 1,
       name: 'Sweater Rajut Premium',
       price: 249000, // Fix: gunakan number, bukan string 'Rp 249.000'
-      description: 'Sweater premium dengan bahan rajutan halus yang nyaman dipakai untuk segala musim. Tersedia dalam berbagai ukuran dan warna.',
+      description:
+        'Sweater premium dengan bahan rajutan halus yang nyaman dipakai untuk segala musim. Tersedia dalam berbagai ukuran dan warna.',
       image: require('../../assets/product_placeholder.jpg'),
     },
   };
 
   const handleBuyNow = () => {
-    navigation.navigate('CheckOut', { product }); // Kirim product ke Checkout
+    navigation.navigate('CheckOut', {product}); // Kirim product ke Checkout
   };
 
+  const [comp, setComp] = useState({});
+  const getCompany = () => {
+    axios.post(apiURL + 'company').then(res => {
+      console.log(res.data);
+      setComp(res.data);
+    });
+  };
+
+  useEffect(() => {
+    getCompany();
+  }, []);
+
   const openWhatsApp = () => {
-    const message = `Halo, saya tertarik dengan produk ${product.name} (Rp ${product.price.toLocaleString()}). Bisa dibantu?`;
-    Linking.openURL(`whatsapp://send?phone=6281234567890&text=${encodeURIComponent(message)}`);
+    const message = `Halo, saya tertarik dengan ${
+      product.nama_jasa
+    } (Rp ${new Intl.NumberFormat().format(product.harga)}). Bisa dibantu?`;
+    const newLocal = Linking.openURL(
+      `whatsapp://send?phone=${comp.tlp}&text=${encodeURIComponent(message)}`,
+    );
+    console.log(
+      `whatsapp://send?phone=${comp.tlp}&text=${encodeURIComponent(message)}`,
+    );
   };
 
   return (
@@ -35,7 +64,9 @@ export default function ProdukDetail({ navigation, route }) {
         {/* Product Image */}
         <View style={styles.imageContainer}>
           <FastImage
-            source={product.image}
+            source={{
+              uri: webURL + product.foto_jasa,
+            }}
             style={styles.productImage}
             resizeMode="contain"
           />
@@ -44,11 +75,13 @@ export default function ProdukDetail({ navigation, route }) {
         {/* Product Info */}
         <View style={styles.infoContainer}>
           <Text style={styles.productName}>{product.name}</Text>
-          <Text style={styles.productPrice}>Rp {product.price.toLocaleString()}</Text>
+          <Text style={styles.productPrice}>
+            Rp {new Intl.NumberFormat().format(product.harga)}
+          </Text>
 
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Deskripsi Produk</Text>
-            <Text style={styles.productDescription}>{product.description}</Text>
+            <Text style={styles.productDescription}>{product.keterangan}</Text>
           </View>
         </View>
       </ScrollView>

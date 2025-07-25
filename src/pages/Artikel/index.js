@@ -63,8 +63,8 @@ export default function Artikel({navigation}) {
               key={artikel.id}
               style={{marginBottom: 20}}
               onPress={() => {
-                //   handleArtikelPress(artikel)
-                Linking.openURL(webURL + artikel.foto);
+                handleArtikelPress(artikel);
+                // Linking.openURL(webURL + artikel.foto);
               }}
               activeOpacity={0.7}>
               <View
