@@ -17,6 +17,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import FastImage from 'react-native-fast-image';
 import {apiURL, getData, webURL} from '../../utils/localStorage';
 import axios from 'axios';
+import {useToast} from 'react-native-toast-notifications';
 
 export default function Checkout({navigation, route}) {
   const {product} = route.params;
@@ -38,6 +39,8 @@ export default function Checkout({navigation, route}) {
     getData('user').then(u => setUser(u));
   }, []);
 
+  const toast = useToast();
+
   const saveTransactionToStorage = async () => {
     try {
       let kirim = {
@@ -51,6 +54,13 @@ export default function Checkout({navigation, route}) {
 
       axios.post(apiURL + 'insert_transaksi', kirim).then(res => {
         console.log(res.data);
+        if (res.data.status == 200) {
+          toast.show(res.data.message, {
+            type: 'success',
+          });
+          setOrderConfirmed(true);
+          // navigation.replace('MainApp');
+        }
       });
       console.log('Berhasil menyimpan transaksi', kirim); // <-- Tambahkan ini
     } catch (error) {
@@ -61,7 +71,6 @@ export default function Checkout({navigation, route}) {
   const selectImageSource = () => {
     Alert.alert('Upload Bukti Transfer', 'Pilih sumber gambar', [
       {text: 'Gallery', onPress: () => handleImageSelection('library')},
-      {text: 'Kamera', onPress: () => handleImageSelection('camera')},
       {text: 'Batal', style: 'cancel'},
     ]);
   };
@@ -100,7 +109,6 @@ export default function Checkout({navigation, route}) {
 
     try {
       await saveTransactionToStorage();
-      // setOrderConfirmed(true);
     } catch (error) {
       Alert.alert('Error', 'Gagal menyimpan transaksi');
       console.error(error);
@@ -124,7 +132,6 @@ export default function Checkout({navigation, route}) {
           <Text style={styles.confirmationTitle}>
             Pembayaran Sedang Diverifikasi
           </Text>
-          <Text style={styles.orderNumber}>Nomor Pesanan: #{orderNumber}</Text>
           <View style={styles.summaryContainer}>
             <Text style={styles.summaryText}>Produk: {product.nama_jasa}</Text>
             <Text style={styles.summaryText}>Jumlah: {quantity}</Text>
@@ -136,12 +143,7 @@ export default function Checkout({navigation, route}) {
             <MyButton
               title="Kembali ke Beranda"
               type="outline"
-              onPress={() => navigation.navigate('Home')}
-            />
-            <MyButton
-              title="Hubungi CS"
-              onPress={openWhatsApp}
-              style={styles.helpButton}
+              onPress={() => navigation.replace('MainApp')}
             />
           </View>
         </View>

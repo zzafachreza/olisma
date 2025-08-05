@@ -132,7 +132,7 @@ export default function ({navigation, route}) {
               }}></View>
             <View style={{padding: 10}}>
               <MyList label="Nama Lengkap" value={user.nama_customer} />
-              <MyList label="Username" value={user.username} />
+              <MyList label="Email" value={user.email} />
               <MyList label="Telepon" value={user.telepon_customer} />
               <MyList label="Alamat" value={user.alamat_customer} />
             </View>

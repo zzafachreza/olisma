@@ -125,10 +125,10 @@ export default function AccountEdit({navigation, route}) {
                 </View> */}
 
         <MyInput
-          label="Username"
-          iconname="at-outline"
-          value={kirim.username}
-          onChangeText={x => setKirim({...kirim, username: x})}
+          label="Email"
+          iconname="mail-outline"
+          value={kirim.email}
+          onChangeText={x => setKirim({...kirim, email: x})}
         />
 
         <MyInput

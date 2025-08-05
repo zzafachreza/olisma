@@ -1,13 +1,14 @@
 import {View, Text, Image, ScrollView} from 'react-native';
 import React from 'react';
-import {colors, fonts} from '../../utils';
+import {colors, fonts, windowWidth} from '../../utils';
 import {MyHeader} from '../../components';
 import {webURL} from '../../utils/localStorage';
 import FastImage from 'react-native-fast-image';
+import RenderHtml from 'react-native-render-html';
 
 export default function DetailArtikel({route}) {
   const {artikel} = route.params;
-
+  const systemFonts = [fonts.secondary[600], fonts.secondary[600]];
   return (
     <View style={{flex: 1, backgroundColor: colors.white}}>
       {/* MyHeader dengan judul artikel */}
@@ -47,15 +48,20 @@ export default function DetailArtikel({route}) {
             {artikel.tanggal} • Oleh {artikel.author}
           </Text>
 
-          <Text
-            style={{
-              fontFamily: fonts.primary[400],
-              fontSize: 14,
-              color: colors.black,
-              lineHeight: 22,
-            }}>
-            {artikel.konten}
-          </Text>
+          <RenderHtml
+            tagsStyles={{
+              p: {
+                fontFamily: fonts.secondary[600],
+                textAlign: 'justify',
+                lineHeight: 26,
+              },
+            }}
+            systemFonts={systemFonts}
+            contentWidth={windowWidth}
+            source={{
+              html: artikel.konten,
+            }}
+          />
         </View>
       </ScrollView>
     </View>

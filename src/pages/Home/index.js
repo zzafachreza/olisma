@@ -19,40 +19,7 @@ const {width} = Dimensions.get('window');
 
 export default function Home({navigation}) {
   const [user] = useState({});
-  const [featuredProducts, setProduct] = useState([
-    {
-      id: 1,
-      name: 'Paket Pendirian CV',
-      price: 3500000,
-      priceTitle: 'Rp 3.500.000',
-      description: `Usaha bermodal kecil, pengambilan keputusan lebih mudah, & pajak lebih rendah.`,
-      image: require('../../assets/product_placeholder.png'),
-    },
-    {
-      id: 2,
-      name: 'Paket Pendirian PT',
-      price: 4500000,
-      priceTitle: 'Rp 4.500.000',
-      description: `Nikmati berbagai keunggulan bisnis dengan badan usaha berbentuk Perseroan Terbatas.`,
-      image: require('../../assets/product_placeholder2.png'),
-    },
-    {
-      id: 3,
-      name: 'Paket Pendirian Firma',
-      price: 3500000,
-      priceTitle: 'Rp 3.500.000',
-      description: `Pendirian Firma untuk Anda yang membutuhkan badan usaha berbentuk persekutuan`,
-      image: require('../../assets/product_placeholder3.png'),
-    },
-    {
-      id: 4,
-      name: 'Persekutuan Perdata',
-      price: 3500000,
-      priceTitle: 'Rp 3.500.000',
-      description: `Pendirian badan usaha berbentuk persekutuan perdata.`,
-      image: require('../../assets/product_placeholder4.png'),
-    },
-  ]);
+  const [featuredProducts, setProduct] = useState([]);
 
   const navigateToDetail = product => {
     navigation.navigate('ProdukDetail', {product});

@@ -13,7 +13,7 @@ import MyLoading from '../../components/MyLoading';
 import {TouchableOpacity} from 'react-native';
 export default function Register({navigation, route}) {
   const [kirim, setKirim] = useState({
-    nama_lengkap: '',
+    email: '',
     username: '',
     password: '',
   });
@@ -27,8 +27,8 @@ export default function Register({navigation, route}) {
   };
   const [loading, setLoading] = useState(false);
   const sendData = () => {
-    if (kirim.username.length == 0) {
-      toast.show('Username masih kosong !');
+    if (kirim.email.length == 0) {
+      toast.show('Email masih kosong !');
     } else if (kirim.nama_lengkap.length == 0) {
       toast.show('Nama Lengkap masih kosong !');
     } else if (kirim.password.length == 0) {
@@ -91,11 +91,11 @@ export default function Register({navigation, route}) {
           />
 
           <MyInput
-            value={kirim.username}
-            onChangeText={x => updateKirim('username', x)}
-            label="Username"
-            placeholder="Masukan username"
-            iconname="at"
+            value={kirim.email}
+            onChangeText={x => updateKirim('email', x)}
+            label="Email"
+            placeholder="Masukan email"
+            iconname="mail-outline"
           />
 
           <MyInput
